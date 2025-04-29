@@ -25,7 +25,8 @@ function HomePage() {
         {
             !selectedMetric && (
                 <>
-                    <h2 className="text-xl mb-5 text-center">Elige una métrica para empezar a realizar cálculos</h2>
+                    <h2 className="text-xl text-center">Elige una métrica para empezar a realizar cálculos</h2>
+                    <p className='text-center mb-2'>Hecho por: Andrés Aguilar</p>
                     <hr className="w-full border-t border-gray-300" />
                 </>
             )
