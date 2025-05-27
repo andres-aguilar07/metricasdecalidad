@@ -6,9 +6,9 @@ const LCOM: React.FC = () => {
   const [lcomValue, setLcomValue] = useState<number>(0);
   
   // Sample class for visualization
-  const [methods, setMethods] = useState<string[]>(['metodo1', 'metodo2', 'metodo3']);
-  const [attributes, setAttributes] = useState<string[]>(['atributo1', 'atributo2', 'atributo3']);
-  const [connections, setConnections] = useState<{[key: string]: string[]}>({
+  const [methods] = useState<string[]>(['metodo1', 'metodo2', 'metodo3']);
+  const [attributes] = useState<string[]>(['atributo1', 'atributo2', 'atributo3']);
+  const [connections] = useState<{[key: string]: string[]}>({
     'metodo1': ['atributo1', 'atributo2'],
     'metodo2': ['atributo2'],
     'metodo3': ['atributo3'],
@@ -51,7 +51,7 @@ const LCOM: React.FC = () => {
             <div className="w-full h-full relative">
               <svg width="100%" height="100%" viewBox="0 0 100 100" preserveAspectRatio="none">
                 {methods.map((method, mIdx) => 
-                  (connections[method] || []).map((attr, aIdx) => {
+                  (connections[method] || []).map((attr) => {
                     const attrIndex = attributes.indexOf(attr);
                     if (attrIndex >= 0) {
                       return (

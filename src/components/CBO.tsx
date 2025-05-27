@@ -170,114 +170,114 @@ const CBO: React.FC = () => {
   };
 
   // Improved dynamic class coupling diagram
-  const renderClassDiagram = () => {
-    if (couplingCount === 0) return null;
+  // const renderClassDiagram = () => {
+  //   if (couplingCount === 0) return null;
     
-    return (
-      <div className="p-4 bg-gray-50 rounded-lg my-4">
-        <h4 className="text-center font-medium mb-2">Diagrama de Acoplamiento</h4>
-        {/* <p className="text-center text-xs text-gray-500 mb-2">
-          Puedes arrastrar las clases para reorganizar el diagrama
-        </p> */}
-        <div 
-          ref={diagramRef}
-          className="relative w-full h-64 bg-white rounded-md border border-gray-200 mt-2 overflow-hidden"
-          onMouseMove={handleMouseMove}
-          onMouseUp={handleMouseUp}
-          onMouseLeave={handleMouseUp}
-        >
-          {/* Center class */}
-          <div 
-            className="absolute bg-blue-500 text-white p-2 rounded-lg shadow-md z-20 cursor-pointer"
-            style={{ left: '50%', top: '50%', transform: 'translate(-50%, -50%)' }}
-            onClick={() => setSelectedClass('MiClase')}
-          >
-            MiClase
-          </div>
+  //   return (
+  //     <div className="p-4 bg-gray-50 rounded-lg my-4">
+  //       <h4 className="text-center font-medium mb-2">Diagrama de Acoplamiento</h4>
+  //       {/* <p className="text-center text-xs text-gray-500 mb-2">
+  //         Puedes arrastrar las clases para reorganizar el diagrama
+  //       </p> */}
+  //       <div 
+  //         ref={diagramRef}
+  //         className="relative w-full h-64 bg-white rounded-md border border-gray-200 mt-2 overflow-hidden"
+  //         onMouseMove={handleMouseMove}
+  //         onMouseUp={handleMouseUp}
+  //         onMouseLeave={handleMouseUp}
+  //       >
+  //         {/* Center class */}
+  //         <div 
+  //           className="absolute bg-blue-500 text-white p-2 rounded-lg shadow-md z-20 cursor-pointer"
+  //           style={{ left: '50%', top: '50%', transform: 'translate(-50%, -50%)' }}
+  //           onClick={() => setSelectedClass('MiClase')}
+  //         >
+  //           MiClase
+  //         </div>
           
-          {/* Connection lines to all classes */}
-          <svg 
-            className="absolute w-full h-full top-0 left-0"
-            viewBox="0 0 100 100"
-            style={{ zIndex: 0 }}
-          >
-            {classes.map((cls) => {
-              const isSelected = selectedClass === cls.id;
-              return (
-                <line 
-                  key={`line-${cls.id}`}
-                  x1="50" y1="50"
-                  x2={cls.x} y2={cls.y}
-                  stroke={getClassColor(cls.type).border}
-                  strokeWidth={isSelected ? 2 : 1}
-                  strokeOpacity={isSelected ? 0.9 : 0.5}
-                  strokeDasharray={cls.type === 'inheritance' ? "none" : "4"}
-                />
-              );
-            })}
-          </svg>
+  //         {/* Connection lines to all classes */}
+  //         <svg 
+  //           className="absolute w-full h-full top-0 left-0"
+  //           viewBox="0 0 100 100"
+  //           style={{ zIndex: 0 }}
+  //         >
+  //           {classes.map((cls) => {
+  //             const isSelected = selectedClass === cls.id;
+  //             return (
+  //               <line 
+  //                 key={`line-${cls.id}`}
+  //                 x1="50" y1="50"
+  //                 x2={cls.x} y2={cls.y}
+  //                 stroke={getClassColor(cls.type).border}
+  //                 strokeWidth={isSelected ? 2 : 1}
+  //                 strokeOpacity={isSelected ? 0.9 : 0.5}
+  //                 strokeDasharray={cls.type === 'inheritance' ? "none" : "4"}
+  //               />
+  //             );
+  //           })}
+  //         </svg>
           
-          {/* Connected classes */}
-          {classes.map((cls) => {
-            const colors = getClassColor(cls.type);
-            const isSelected = selectedClass === cls.id;
+  //         {/* Connected classes */}
+  //         {classes.map((cls) => {
+  //           const colors = getClassColor(cls.type);
+  //           const isSelected = selectedClass === cls.id;
             
-            return (
-              <div 
-                key={cls.id}
-                className="absolute p-2 rounded shadow-sm text-xs transition-all"
-                style={{ 
-                  left: `${cls.x}%`, 
-                  top: `${cls.y}%`, 
-                  transform: 'translate(-50%, -50%)',
-                  backgroundColor: colors.bg,
-                  borderColor: colors.border,
-                  color: colors.text,
-                  border: isSelected ? `2px solid ${colors.border}` : `1px solid ${colors.border}`,
-                  zIndex: isSelected ? 15 : 10,
-                  cursor: 'grab',
-                  opacity: isDragging === cls.id ? 0.8 : 1,
-                  boxShadow: isSelected ? `0 0 6px ${colors.border}` : 'none',
-                  fontWeight: isSelected ? 'bold' : 'normal'
-                }}
-                onClick={(e) => { e.stopPropagation(); setSelectedClass(cls.id); }}
-                onMouseDown={(e) => handleMouseDown(cls.id, e)}
-              >
-                {cls.name}
-              </div>
-            );
-          })}
-        </div>
+  //           return (
+  //             <div 
+  //               key={cls.id}
+  //               className="absolute p-2 rounded shadow-sm text-xs transition-all"
+  //               style={{ 
+  //                 left: `${cls.x}%`, 
+  //                 top: `${cls.y}%`, 
+  //                 transform: 'translate(-50%, -50%)',
+  //                 backgroundColor: colors.bg,
+  //                 borderColor: colors.border,
+  //                 color: colors.text,
+  //                 border: isSelected ? `2px solid ${colors.border}` : `1px solid ${colors.border}`,
+  //                 zIndex: isSelected ? 15 : 10,
+  //                 cursor: 'grab',
+  //                 opacity: isDragging === cls.id ? 0.8 : 1,
+  //                 boxShadow: isSelected ? `0 0 6px ${colors.border}` : 'none',
+  //                 fontWeight: isSelected ? 'bold' : 'normal'
+  //               }}
+  //               onClick={(e) => { e.stopPropagation(); setSelectedClass(cls.id); }}
+  //               onMouseDown={(e) => handleMouseDown(cls.id, e)}
+  //             >
+  //               {cls.name}
+  //             </div>
+  //           );
+  //         })}
+  //       </div>
         
-        <div className="mt-3 flex flex-wrap gap-2 justify-center">
-          <div className="flex items-center">
-            <div className="w-3 h-3 bg-blue-500 rounded-full mr-1"></div>
-            <span className="text-xs">MiClase</span>
-          </div>
-          <div className="flex items-center">
-            <div className="w-3 h-3 rounded-full mr-1" style={{backgroundColor: '#2563EB'}}></div>
-            <span className="text-xs">Imports</span>
-          </div>
-          <div className="flex items-center">
-            <div className="w-3 h-3 rounded-full mr-1" style={{backgroundColor: '#10B981'}}></div>
-            <span className="text-xs">Métodos</span>
-          </div>
-          <div className="flex items-center">
-            <div className="w-3 h-3 rounded-full mr-1" style={{backgroundColor: '#F97316'}}></div>
-            <span className="text-xs">Herencia</span>
-          </div>
-          <div className="flex items-center">
-            <div className="w-3 h-3 rounded-full mr-1" style={{backgroundColor: '#8B5CF6'}}></div>
-            <span className="text-xs">Referencias</span>
-          </div>
-          <div className="flex items-center">
-            <div className="w-3 h-3 rounded-full mr-1" style={{backgroundColor: '#EC4899'}}></div>
-            <span className="text-xs">Instancias</span>
-          </div>
-        </div>
-      </div>
-    );
-  };
+  //       <div className="mt-3 flex flex-wrap gap-2 justify-center">
+  //         <div className="flex items-center">
+  //           <div className="w-3 h-3 bg-blue-500 rounded-full mr-1"></div>
+  //           <span className="text-xs">MiClase</span>
+  //         </div>
+  //         <div className="flex items-center">
+  //           <div className="w-3 h-3 rounded-full mr-1" style={{backgroundColor: '#2563EB'}}></div>
+  //           <span className="text-xs">Imports</span>
+  //         </div>
+  //         <div className="flex items-center">
+  //           <div className="w-3 h-3 rounded-full mr-1" style={{backgroundColor: '#10B981'}}></div>
+  //           <span className="text-xs">Métodos</span>
+  //         </div>
+  //         <div className="flex items-center">
+  //           <div className="w-3 h-3 rounded-full mr-1" style={{backgroundColor: '#F97316'}}></div>
+  //           <span className="text-xs">Herencia</span>
+  //         </div>
+  //         <div className="flex items-center">
+  //           <div className="w-3 h-3 rounded-full mr-1" style={{backgroundColor: '#8B5CF6'}}></div>
+  //           <span className="text-xs">Referencias</span>
+  //         </div>
+  //         <div className="flex items-center">
+  //           <div className="w-3 h-3 rounded-full mr-1" style={{backgroundColor: '#EC4899'}}></div>
+  //           <span className="text-xs">Instancias</span>
+  //         </div>
+  //       </div>
+  //     </div>
+  //   );
+  // };
 
   return (
     <div className="flex flex-col items-center">
