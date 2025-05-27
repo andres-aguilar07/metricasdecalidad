@@ -6,8 +6,10 @@ import SatisfaccionCliente from '../components/SatisfaccionCliente';
 import Complejidad from '../components/Complejidad';
 import LCOM from '../components/LCOM';
 import CBO from '../components/CBO';
+import FrecuenciaCambios from '../components/FrecuenciaCambios';
+import IndiceMantenibilidad from '../components/IndiceMantenibilidad';
 
-type MetricType = 'loc' | 'puntosFuncion' | 'satisfaccionCliente' | 'complejidad' | 'lcom' | 'cbo' | null;
+type MetricType = 'loc' | 'puntosFuncion' | 'satisfaccionCliente' | 'complejidad' | 'lcom' | 'cbo' | 'frecuenciaCambios' | 'indiceMantenibilidad' | null;
 
 function HomePage() {
   const [selectedMetric, setSelectedMetric] = useState<MetricType>(null);
@@ -88,6 +90,39 @@ function HomePage() {
                 </Button>
               </div>
             </div>
+
+            <div>
+              <h3 className="text-lg font-medium mb-3">Indice de madurez</h3>
+              <div className="flex flex-col sm:flex-row gap-4 w-full justify-center">
+                <Button 
+                  onClick={() => setSelectedMetric('frecuenciaCambios')}
+                  className="min-w-32"
+                >
+                  Frecuencia de cambios por módulo
+                </Button>
+
+                <Button 
+                  onClick={() => setSelectedMetric('indiceMantenibilidad')}
+                  className="min-w-32"
+                >
+                  Índice de mantenibilidad
+                </Button>
+
+                <Button 
+                  onClick={() => setSelectedMetric('complejidad')}
+                  className="min-w-32"
+                >
+                  Complejidad ciclomática
+                </Button>
+
+                <Button 
+                  onClick={() => setSelectedMetric('loc')}
+                  className="min-w-32"
+                >
+                  LOC
+                </Button>
+              </div>
+            </div>
           </div>
         ) : (
           <div className="w-full">
@@ -104,6 +139,8 @@ function HomePage() {
             {selectedMetric === 'complejidad' && <Complejidad />}
             {selectedMetric === 'lcom' && <LCOM />}
             {selectedMetric === 'cbo' && <CBO />}
+            {selectedMetric === 'frecuenciaCambios' && <FrecuenciaCambios />}
+            {selectedMetric === 'indiceMantenibilidad' && <IndiceMantenibilidad />}
           </div>
         )}
       </div>
