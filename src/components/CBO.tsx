@@ -1,7 +1,19 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+
+interface ClassNode {
+  id: string;
+  name: string;
+  type: 'import' | 'method' | 'inheritance' | 'reference' | 'instance';
+  x: number;
+  y: number;
+}
 
 const CBO: React.FC = () => {
   const [couplingCount, setCouplingCount] = useState<number>(0);
+  const [selectedClass, setSelectedClass] = useState<string | null>(null);
+  const [isDragging, setIsDragging] = useState<string | null>(null);
+  const [classes, setClasses] = useState<ClassNode[]>([]);
+  const diagramRef = useRef<HTMLDivElement>(null);
   
   // State for visualization
   const [couplingDetails, setCouplingDetails] = useState<{
@@ -24,6 +36,42 @@ const CBO: React.FC = () => {
     setCouplingCount(totalCoupling);
   }, [couplingDetails]);
   
+  // Generate class nodes whenever coupling details change
+  useEffect(() => {
+    const newClasses: ClassNode[] = [];
+    const types = [
+      { key: 'imports', label: 'Import', type: 'import' as const, color: '#2563EB' },
+      { key: 'methodCalls', label: 'Método', type: 'method' as const, color: '#10B981' },
+      { key: 'inheritance', label: 'Herencia', type: 'inheritance' as const, color: '#F97316' },
+      { key: 'references', label: 'Referencia', type: 'reference' as const, color: '#8B5CF6' },
+      { key: 'instanceCreation', label: 'Instancia', type: 'instance' as const, color: '#EC4899' }
+    ];
+    
+    // Generate classes for each coupling type
+    types.forEach(typeInfo => {
+      const count = couplingDetails[typeInfo.key as keyof typeof couplingDetails];
+      for (let i = 0; i < count; i++) {
+        // Calculate angle based on total classes and current index
+        const currentIndex = newClasses.length;
+        const angle = (currentIndex / Math.max(1, totalClasses)) * 2 * Math.PI;
+        const radius = 90; // Distance from center
+        
+        newClasses.push({
+          id: `${typeInfo.key}-${i}`,
+          name: `${typeInfo.label}${i + 1}`,
+          type: typeInfo.type,
+          x: 50 + radius * Math.cos(angle),
+          y: 50 + radius * Math.sin(angle)
+        });
+      }
+    });
+    
+    setClasses(newClasses);
+  }, [couplingDetails]);
+  
+  // Total number of classes for layout calculations
+  const totalClasses = Object.values(couplingDetails).reduce((sum, val) => sum + val, 0);
+  
   // Evaluate CBO standards
   const getCBOStandard = () => {
     if (couplingCount === 0) return { text: "Sin acoplamiento", color: "text-gray-500" };
@@ -39,6 +87,44 @@ const CBO: React.FC = () => {
       ...prev,
       [type]: Math.max(0, value)
     }));
+  };
+  
+  // Mouse handlers for dragging
+  const handleMouseDown = useCallback((classId: string, e: React.MouseEvent) => {
+    e.preventDefault();
+    setIsDragging(classId);
+  }, []);
+  
+  const handleMouseUp = useCallback(() => {
+    setIsDragging(null);
+  }, []);
+  
+  const handleMouseMove = useCallback((e: React.MouseEvent) => {
+    if (!isDragging || !diagramRef.current) return;
+    
+    const rect = diagramRef.current.getBoundingClientRect();
+    const x = ((e.clientX - rect.left) / rect.width) * 100;
+    const y = ((e.clientY - rect.top) / rect.height) * 100;
+    
+    setClasses(prevClasses => 
+      prevClasses.map(cls => 
+        cls.id === isDragging 
+          ? { ...cls, x: Math.min(Math.max(10, x), 90), y: Math.min(Math.max(10, y), 90) }
+          : cls
+      )
+    );
+  }, [isDragging]);
+
+  // Get color for class node based on type
+  const getClassColor = (type: string) => {
+    switch (type) {
+      case 'import': return { bg: '#DBEAFE', border: '#2563EB', text: '#1E40AF' };
+      case 'method': return { bg: '#DCFCE7', border: '#10B981', text: '#047857' };
+      case 'inheritance': return { bg: '#FFEDD5', border: '#F97316', text: '#C2410C' };
+      case 'reference': return { bg: '#F3E8FF', border: '#8B5CF6', text: '#6D28D9' };
+      case 'instance': return { bg: '#FCE7F3', border: '#EC4899', text: '#BE185D' };
+      default: return { bg: '#F3F4F6', border: '#9CA3AF', text: '#4B5563' };
+    }
   };
 
   // Render coupling visualization
@@ -83,68 +169,110 @@ const CBO: React.FC = () => {
     );
   };
 
-  // Sample class coupling diagram
+  // Improved dynamic class coupling diagram
   const renderClassDiagram = () => {
     if (couplingCount === 0) return null;
-    
-    // Generate some "fake" class names based on coupling count
-    const connectedClasses = [];
-    for (let i = 1; i <= Math.min(couplingCount, 6); i++) {
-      connectedClasses.push(`Clase${i}`);
-    }
     
     return (
       <div className="p-4 bg-gray-50 rounded-lg my-4">
         <h4 className="text-center font-medium mb-2">Diagrama de Acoplamiento</h4>
-        <div className="flex justify-center">
-          <div className="relative w-64 h-64">
-            {/* Center class */}
-            <div 
-              className="absolute bg-blue-500 text-white p-2 rounded-lg shadow-md z-10"
-              style={{ left: '50%', top: '50%', transform: 'translate(-50%, -50%)' }}
-            >
-              MiClase
-            </div>
-            
-            {/* Connected classes in a circle around the center */}
-            {connectedClasses.map((className, index) => {
-              const angle = (index * 2 * Math.PI) / connectedClasses.length;
-              const radius = 90; // Distance from center
-              const x = 50 + radius * Math.cos(angle);
-              const y = 50 + radius * Math.sin(angle);
-              
+        <p className="text-center text-xs text-gray-500 mb-2">
+          Puedes arrastrar las clases para reorganizar el diagrama
+        </p>
+        <div 
+          ref={diagramRef}
+          className="relative w-full h-64 bg-white rounded-md border border-gray-200 mt-2 overflow-hidden"
+          onMouseMove={handleMouseMove}
+          onMouseUp={handleMouseUp}
+          onMouseLeave={handleMouseUp}
+        >
+          {/* Center class */}
+          <div 
+            className="absolute bg-blue-500 text-white p-2 rounded-lg shadow-md z-20 cursor-pointer"
+            style={{ left: '50%', top: '50%', transform: 'translate(-50%, -50%)' }}
+            onClick={() => setSelectedClass('MiClase')}
+          >
+            MiClase
+          </div>
+          
+          {/* Connection lines to all classes */}
+          <svg 
+            className="absolute w-full h-full top-0 left-0"
+            viewBox="0 0 100 100"
+            style={{ zIndex: 0 }}
+          >
+            {classes.map((cls) => {
+              const isSelected = selectedClass === cls.id;
               return (
-                <React.Fragment key={className}>
-                  {/* Connection line */}
-                  <svg 
-                    className="absolute w-full h-full top-0 left-0"
-                    viewBox="0 0 100 100"
-                    style={{ zIndex: 0 }}
-                  >
-                    <line 
-                      x1="50" y1="50"
-                      x2={x} y2={y}
-                      stroke="#94A3B8"
-                      strokeWidth="1"
-                      strokeDasharray="4"
-                    />
-                  </svg>
-                  
-                  {/* Class node */}
-                  <div 
-                    className="absolute bg-gray-100 border border-gray-300 p-2 rounded shadow-sm text-xs"
-                    style={{ 
-                      left: `${x}%`, 
-                      top: `${y}%`, 
-                      transform: 'translate(-50%, -50%)',
-                      zIndex: 5
-                    }}
-                  >
-                    {className}
-                  </div>
-                </React.Fragment>
+                <line 
+                  key={`line-${cls.id}`}
+                  x1="50" y1="50"
+                  x2={cls.x} y2={cls.y}
+                  stroke={getClassColor(cls.type).border}
+                  strokeWidth={isSelected ? 2 : 1}
+                  strokeOpacity={isSelected ? 0.9 : 0.5}
+                  strokeDasharray={cls.type === 'inheritance' ? "none" : "4"}
+                />
               );
             })}
+          </svg>
+          
+          {/* Connected classes */}
+          {classes.map((cls) => {
+            const colors = getClassColor(cls.type);
+            const isSelected = selectedClass === cls.id;
+            
+            return (
+              <div 
+                key={cls.id}
+                className="absolute p-2 rounded shadow-sm text-xs transition-all"
+                style={{ 
+                  left: `${cls.x}%`, 
+                  top: `${cls.y}%`, 
+                  transform: 'translate(-50%, -50%)',
+                  backgroundColor: colors.bg,
+                  borderColor: colors.border,
+                  color: colors.text,
+                  border: isSelected ? `2px solid ${colors.border}` : `1px solid ${colors.border}`,
+                  zIndex: isSelected ? 15 : 10,
+                  cursor: 'grab',
+                  opacity: isDragging === cls.id ? 0.8 : 1,
+                  boxShadow: isSelected ? `0 0 6px ${colors.border}` : 'none',
+                  fontWeight: isSelected ? 'bold' : 'normal'
+                }}
+                onClick={(e) => { e.stopPropagation(); setSelectedClass(cls.id); }}
+                onMouseDown={(e) => handleMouseDown(cls.id, e)}
+              >
+                {cls.name}
+              </div>
+            );
+          })}
+        </div>
+        
+        <div className="mt-3 flex flex-wrap gap-2 justify-center">
+          <div className="flex items-center">
+            <div className="w-3 h-3 bg-blue-500 rounded-full mr-1"></div>
+            <span className="text-xs">MiClase</span>
+          </div>
+          <div className="flex items-center">
+            <div className="w-3 h-3 rounded-full mr-1" style={{backgroundColor: '#2563EB'}}></div>
+            <span className="text-xs">Imports</span>
+          </div>
+          <div className="flex items-center">
+            <div className="w-3 h-3 rounded-full mr-1" style={{backgroundColor: '#10B981'}}></div>
+            <span className="text-xs">Métodos</span>
+          </div>
+          <div className="flex items-center">
+            <div className="w-3 h-3 rounded-full mr-1" style={{backgroundColor: '#F97316'}}></div>
+            <span className="text-xs">Herencia</span>
+          </div>
+          <div className="flex items-center">
+            <div className="w-3 h-3 rounded-full mr-1" style={{backgroundColor: '#8B5CF6'}}></div>
+            <span className="text-xs">Referencias</span>
+          </div>
+          <div className="flex items-center">
+            <div className="w-3 h-3 rounded-full mr-1" style={{backgroundColor: '#EC4899'}}></div>
+            <span className="text-xs">Instancias</span>
           </div>
         </div>
       </div>
@@ -264,6 +392,17 @@ const CBO: React.FC = () => {
         <p className="mt-4 text-sm">
           Un valor bajo de CBO es deseable, ya que indica menos dependencias y mayor facilidad de mantenimiento y reutilización.
         </p>
+        
+        <div className="mt-4 p-3 bg-blue-50 rounded-md">
+          <h4 className="font-medium mb-1">¿Cómo reducir el acoplamiento?</h4>
+          <ul className="list-disc pl-5 text-sm space-y-1">
+            <li>Aplicar el principio de inyección de dependencias</li>
+            <li>Utilizar interfaces y abstracciones en lugar de clases concretas</li>
+            <li>Limitar el uso de herencia en favor de la composición</li>
+            <li>Seguir el principio de responsabilidad única (SRP)</li>
+            <li>Minimizar la exposición de detalles internos de implementación</li>
+          </ul>
+        </div>
       </div>
     </div>
   );

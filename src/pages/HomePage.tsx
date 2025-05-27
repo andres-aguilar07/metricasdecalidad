@@ -64,7 +64,7 @@ function HomePage() {
             </div>
             
             <div>
-              <h3 className="text-lg font-medium mb-3">Métricas de madurez de software</h3>
+              <h3 className="text-lg font-medium mb-3">Métricas de POO</h3>
               <div className="flex flex-col sm:flex-row gap-4 w-full justify-center">
                 <Button 
                   onClick={() => setSelectedMetric('complejidad')}
