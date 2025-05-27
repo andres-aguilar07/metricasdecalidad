@@ -69,7 +69,6 @@ function HomePage() {
                 <Button 
                   onClick={() => setSelectedMetric('complejidad')}
                   className="min-w-32"
-                  variant="secondary"
                 >
                   Complejidad ciclomática
                 </Button>
@@ -77,7 +76,6 @@ function HomePage() {
                 <Button 
                   onClick={() => setSelectedMetric('lcom')}
                   className="min-w-32"
-                  variant="secondary"
                 >
                   Cohesión (LCOM)
                 </Button>
@@ -85,7 +83,6 @@ function HomePage() {
                 <Button 
                   onClick={() => setSelectedMetric('cbo')}
                   className="min-w-32"
-                  variant="secondary"
                 >
                   Acoplamiento (CBO)
                 </Button>
