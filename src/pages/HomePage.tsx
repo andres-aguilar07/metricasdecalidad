@@ -92,7 +92,6 @@ function HomePage() {
         ) : (
           <div className="w-full">
             <Button 
-              variant="outline" 
               onClick={() => setSelectedMetric(null)}
               className="mb-6"
             >

@@ -176,9 +176,9 @@ const CBO: React.FC = () => {
     return (
       <div className="p-4 bg-gray-50 rounded-lg my-4">
         <h4 className="text-center font-medium mb-2">Diagrama de Acoplamiento</h4>
-        <p className="text-center text-xs text-gray-500 mb-2">
+        {/* <p className="text-center text-xs text-gray-500 mb-2">
           Puedes arrastrar las clases para reorganizar el diagrama
-        </p>
+        </p> */}
         <div 
           ref={diagramRef}
           className="relative w-full h-64 bg-white rounded-md border border-gray-200 mt-2 overflow-hidden"
@@ -286,122 +286,236 @@ const CBO: React.FC = () => {
         Mide el Acoplamiento entre Objetos (CBO). Cuantifica la cantidad de dependencias entre una clase y otras clases del sistema.
       </p>
       
-      <div className="w-full max-w-md mb-8 p-6 border rounded-md bg-white shadow-sm">
-        <h3 className="text-lg font-bold mb-4">CBO = Número de clases externas acopladas</h3>
-        <p className="mb-4 text-sm">
-          El acoplamiento ocurre cuando una clase:<br />
-          • Usa atributos o métodos de otra clase<br />
-          • Instancia objetos de otra clase<br />
-          • Hereda de otra clase<br />
-          • Tiene referencias a clases en parámetros o variables<br />
-          • Llama métodos de otras clases directamente
-        </p>
-        
-        <div className="space-y-4 mb-6">
-          <div>
-            <label className="block text-sm font-medium mb-1">Imports/Dependencias</label>
-            <input
-              type="number"
-              min="0"
-              className="w-full p-2 border rounded-md"
-              value={couplingDetails.imports || ''}
-              onChange={(e) => handleCouplingChange('imports', Number(e.target.value))}
-            />
-          </div>
-          
-          <div>
-            <label className="block text-sm font-medium mb-1">Llamadas a métodos externos</label>
-            <input
-              type="number"
-              min="0"
-              className="w-full p-2 border rounded-md"
-              value={couplingDetails.methodCalls || ''}
-              onChange={(e) => handleCouplingChange('methodCalls', Number(e.target.value))}
-            />
-          </div>
-          
-          <div>
-            <label className="block text-sm font-medium mb-1">Herencia (clases padre)</label>
-            <input
-              type="number"
-              min="0"
-              className="w-full p-2 border rounded-md"
-              value={couplingDetails.inheritance || ''}
-              onChange={(e) => handleCouplingChange('inheritance', Number(e.target.value))}
-            />
-          </div>
-          
-          <div>
-            <label className="block text-sm font-medium mb-1">Referencias en parámetros/variables</label>
-            <input
-              type="number"
-              min="0"
-              className="w-full p-2 border rounded-md"
-              value={couplingDetails.references || ''}
-              onChange={(e) => handleCouplingChange('references', Number(e.target.value))}
-            />
-          </div>
-          
-          <div>
-            <label className="block text-sm font-medium mb-1">Creación de instancias</label>
-            <input
-              type="number"
-              min="0"
-              className="w-full p-2 border rounded-md"
-              value={couplingDetails.instanceCreation || ''}
-              onChange={(e) => handleCouplingChange('instanceCreation', Number(e.target.value))}
-            />
-          </div>
-        </div>
-        
-        {renderCouplingVisualization()}
-        {renderClassDiagram()}
-        
-        <div className="mt-6 p-4 bg-gray-50 rounded-md">
-          <h4 className="font-medium">Resultado:</h4>
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-2xl font-bold">{couplingCount}</p>
-              <p className={`text-sm font-medium ${getCBOStandard().color}`}>
-                {getCBOStandard().text}
-              </p>
+      <div className="w-full max-w-4xl mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Left column - Inputs */}
+          <div className="p-6 border rounded-md bg-white shadow-sm">
+            <h3 className="text-lg font-bold mb-4">CBO = Número de clases externas acopladas</h3>
+            <p className="mb-4 text-sm">
+              El acoplamiento ocurre cuando una clase:<br />
+              • Usa atributos o métodos de otra clase<br />
+              • Instancia objetos de otra clase<br />
+              • Hereda de otra clase<br />
+              • Tiene referencias a clases en parámetros o variables<br />
+              • Llama métodos de otras clases directamente
+            </p>
+            
+            <div className="space-y-4 mb-6">
+              <div>
+                <label className="block text-sm font-medium mb-1">Imports/Dependencias</label>
+                <input
+                  type="number"
+                  min="0"
+                  className="w-full p-2 border rounded-md"
+                  value={couplingDetails.imports || ''}
+                  onChange={(e) => handleCouplingChange('imports', Number(e.target.value))}
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium mb-1">Llamadas a métodos externos</label>
+                <input
+                  type="number"
+                  min="0"
+                  className="w-full p-2 border rounded-md"
+                  value={couplingDetails.methodCalls || ''}
+                  onChange={(e) => handleCouplingChange('methodCalls', Number(e.target.value))}
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium mb-1">Herencia (clases padre)</label>
+                <input
+                  type="number"
+                  min="0"
+                  className="w-full p-2 border rounded-md"
+                  value={couplingDetails.inheritance || ''}
+                  onChange={(e) => handleCouplingChange('inheritance', Number(e.target.value))}
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium mb-1">Referencias en parámetros/variables</label>
+                <input
+                  type="number"
+                  min="0"
+                  className="w-full p-2 border rounded-md"
+                  value={couplingDetails.references || ''}
+                  onChange={(e) => handleCouplingChange('references', Number(e.target.value))}
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium mb-1">Creación de instancias</label>
+                <input
+                  type="number"
+                  min="0"
+                  className="w-full p-2 border rounded-md"
+                  value={couplingDetails.instanceCreation || ''}
+                  onChange={(e) => handleCouplingChange('instanceCreation', Number(e.target.value))}
+                />
+              </div>
             </div>
-            <div className="w-16 h-16 rounded-full flex items-center justify-center" 
-                 style={{
-                   backgroundColor: couplingCount <= 5 ? '#10B981' : 
-                                   couplingCount <= 10 ? '#FBBF24' :
-                                   couplingCount <= 15 ? '#F97316' : '#EF4444',
-                   color: '#FFFFFF',
-                   fontSize: '24px',
-                   fontWeight: 'bold'
-                 }}>
-              {couplingCount}
+            
+            {renderCouplingVisualization()}
+            
+            <div className="mt-6 p-4 bg-gray-50 rounded-md">
+              <h4 className="font-medium">Resultado:</h4>
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-2xl font-bold">{couplingCount}</p>
+                  <p className={`text-sm font-medium ${getCBOStandard().color}`}>
+                    {getCBOStandard().text}
+                  </p>
+                </div>
+                <div className="w-16 h-16 rounded-full flex items-center justify-center" 
+                    style={{
+                      backgroundColor: couplingCount <= 5 ? '#10B981' : 
+                                      couplingCount <= 10 ? '#FBBF24' :
+                                      couplingCount <= 15 ? '#F97316' : '#EF4444',
+                      color: '#FFFFFF',
+                      fontSize: '24px',
+                      fontWeight: 'bold'
+                    }}>
+                  {couplingCount}
+                </div>
+              </div>
             </div>
           </div>
-        </div>
-      </div>
-      
-      <div className="w-full max-w-md p-6 border rounded-md bg-white shadow-sm">
-        <h3 className="text-lg font-bold mb-2">Interpretación</h3>
-        <ul className="list-disc pl-5 space-y-2 text-sm">
-          <li><span className="font-medium text-green-600">CBO ≤ 5:</span> Bajo acoplamiento. Buen diseño modular.</li>
-          <li><span className="font-medium text-yellow-600">CBO = 6-10:</span> Acoplamiento moderado. Aceptable en muchos casos.</li>
-          <li><span className="font-medium text-orange-600">CBO = 11-15:</span> Alto acoplamiento. Considerar refactorización.</li>
-          <li><span className="font-medium text-red-600">CBO &gt; 15:</span> Acoplamiento excesivo. Alta dependencia y fragilidad.</li>
-        </ul>
-        <p className="mt-4 text-sm">
-          Un valor bajo de CBO es deseable, ya que indica menos dependencias y mayor facilidad de mantenimiento y reutilización.
-        </p>
-        
-        <div className="mt-4 p-3 bg-blue-50 rounded-md">
-          <h4 className="font-medium mb-1">¿Cómo reducir el acoplamiento?</h4>
-          <ul className="list-disc pl-5 text-sm space-y-1">
-            <li>Aplicar el principio de inyección de dependencias</li>
-            <li>Utilizar interfaces y abstracciones en lugar de clases concretas</li>
-            <li>Limitar el uso de herencia en favor de la composición</li>
-            <li>Seguir el principio de responsabilidad única (SRP)</li>
-            <li>Minimizar la exposición de detalles internos de implementación</li>
-          </ul>
+          
+          {/* Right column - Dynamic diagram */}
+          <div className="flex flex-col">
+            <div className="p-4 bg-white rounded-lg border border-gray-200">
+              <h4 className="text-center font-medium mb-2">Diagrama de Acoplamiento</h4>
+              {/* <p className="text-center text-xs text-gray-500 mb-2">
+                Puedes arrastrar las clases para reorganizar el diagrama
+              </p> */}
+              <div 
+                ref={diagramRef}
+                className="relative w-full h-72 bg-white rounded-md border border-gray-200 mt-2 overflow-hidden"
+                onMouseMove={handleMouseMove}
+                onMouseUp={handleMouseUp}
+                onMouseLeave={handleMouseUp}
+              >
+                {/* Center class */}
+                <div 
+                  className="absolute bg-blue-500 text-white p-2 rounded-lg shadow-md z-20 cursor-pointer"
+                  style={{ left: '50%', top: '50%', transform: 'translate(-50%, -50%)' }}
+                  onClick={() => setSelectedClass('MiClase')}
+                >
+                  MiClase
+                </div>
+                
+                {/* Connection lines to all classes */}
+                <svg 
+                  className="absolute w-full h-full top-0 left-0"
+                  viewBox="0 0 100 100"
+                  style={{ zIndex: 0 }}
+                >
+                  {classes.map((cls) => {
+                    const isSelected = selectedClass === cls.id;
+                    return (
+                      <line 
+                        key={`line-${cls.id}`}
+                        x1="50" y1="50"
+                        x2={cls.x} y2={cls.y}
+                        stroke={getClassColor(cls.type).border}
+                        strokeWidth={isSelected ? 2 : 1}
+                        strokeOpacity={isSelected ? 0.9 : 0.5}
+                        strokeDasharray={cls.type === 'inheritance' ? "none" : "4"}
+                      />
+                    );
+                  })}
+                </svg>
+                
+                {/* Connected classes */}
+                {classes.map((cls) => {
+                  const colors = getClassColor(cls.type);
+                  const isSelected = selectedClass === cls.id;
+                  
+                  return (
+                    <div 
+                      key={cls.id}
+                      className="absolute p-2 rounded shadow-sm text-xs transition-all"
+                      style={{ 
+                        left: `${cls.x}%`, 
+                        top: `${cls.y}%`, 
+                        transform: 'translate(-50%, -50%)',
+                        backgroundColor: colors.bg,
+                        borderColor: colors.border,
+                        color: colors.text,
+                        border: isSelected ? `2px solid ${colors.border}` : `1px solid ${colors.border}`,
+                        zIndex: isSelected ? 15 : 10,
+                        cursor: 'grab',
+                        opacity: isDragging === cls.id ? 0.8 : 1,
+                        boxShadow: isSelected ? `0 0 6px ${colors.border}` : 'none',
+                        fontWeight: isSelected ? 'bold' : 'normal'
+                      }}
+                      onClick={(e) => { e.stopPropagation(); setSelectedClass(cls.id); }}
+                      onMouseDown={(e) => handleMouseDown(cls.id, e)}
+                    >
+                      {cls.name}
+                    </div>
+                  );
+                })}
+                
+                {/* Message when no classes */}
+                {classes.length === 0 && (
+                  <div className="absolute inset-0 flex items-center justify-center text-gray-400 text-sm">
+                    Agrega relaciones de acoplamiento para visualizar el diagrama
+                  </div>
+                )}
+              </div>
+              
+              <div className="mt-3 flex flex-wrap gap-2 justify-center">
+                <div className="flex items-center">
+                  <div className="w-3 h-3 bg-blue-500 rounded-full mr-1"></div>
+                  <span className="text-xs">MiClase</span>
+                </div>
+                <div className="flex items-center">
+                  <div className="w-3 h-3 rounded-full mr-1" style={{backgroundColor: '#2563EB'}}></div>
+                  <span className="text-xs">Imports</span>
+                </div>
+                <div className="flex items-center">
+                  <div className="w-3 h-3 rounded-full mr-1" style={{backgroundColor: '#10B981'}}></div>
+                  <span className="text-xs">Métodos</span>
+                </div>
+                <div className="flex items-center">
+                  <div className="w-3 h-3 rounded-full mr-1" style={{backgroundColor: '#F97316'}}></div>
+                  <span className="text-xs">Herencia</span>
+                </div>
+                <div className="flex items-center">
+                  <div className="w-3 h-3 rounded-full mr-1" style={{backgroundColor: '#8B5CF6'}}></div>
+                  <span className="text-xs">Referencias</span>
+                </div>
+                <div className="flex items-center">
+                  <div className="w-3 h-3 rounded-full mr-1" style={{backgroundColor: '#EC4899'}}></div>
+                  <span className="text-xs">Instancias</span>
+                </div>
+              </div>
+            </div>
+            
+            <div className="mt-6 p-6 border rounded-md bg-white shadow-sm">
+              <h3 className="text-lg font-bold mb-2">Interpretación</h3>
+              <ul className="list-disc pl-5 space-y-2 text-sm">
+                <li><span className="font-medium text-green-600">CBO ≤ 5:</span> Bajo acoplamiento. Buen diseño modular.</li>
+                <li><span className="font-medium text-yellow-600">CBO = 6-10:</span> Acoplamiento moderado. Aceptable en muchos casos.</li>
+                <li><span className="font-medium text-orange-600">CBO = 11-15:</span> Alto acoplamiento. Considerar refactorización.</li>
+                <li><span className="font-medium text-red-600">CBO &gt; 15:</span> Acoplamiento excesivo. Alta dependencia y fragilidad.</li>
+              </ul>
+              
+              <div className="mt-4 p-3 bg-blue-50 rounded-md">
+                <h4 className="font-medium mb-1">¿Cómo reducir el acoplamiento?</h4>
+                <ul className="list-disc pl-5 text-sm space-y-1">
+                  <li>Aplicar el principio de inyección de dependencias</li>
+                  <li>Utilizar interfaces y abstracciones en lugar de clases concretas</li>
+                  <li>Limitar el uso de herencia en favor de la composición</li>
+                  <li>Seguir el principio de responsabilidad única (SRP)</li>
+                  <li>Minimizar la exposición de detalles internos de implementación</li>
+                </ul>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
