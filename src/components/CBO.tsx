@@ -94,13 +94,15 @@ const CBO: React.FC = () => {
     
     // Calculate position for new class
     const angle = (classes.length / Math.max(1, 8)) * 2 * Math.PI;
-    const radius = 120; // Distance from center
+    const safeRadius = 130; // Usar el mismo radio seguro que en resetClassPositions
+    const centerX = 50;
+    const centerY = 50;
     
     const newClass: ClassNode = {
       id: `class-${Date.now()}`,
       name: newClassName.trim(),
-      x: 50 + radius * Math.cos(angle),
-      y: 50 + radius * Math.sin(angle),
+      x: centerX + safeRadius * Math.cos(angle),
+      y: centerY + safeRadius * Math.sin(angle),
       couplingScore: 0
     };
     
@@ -164,14 +166,46 @@ const CBO: React.FC = () => {
     const x = ((e.clientX - rect.left) / rect.width) * 100;
     const y = ((e.clientY - rect.top) / rect.height) * 100;
     
+    // Límites más estrictos para evitar que las clases se salgan del área visible
+    // Usamos 15% y 85% como límites para mantener las clases completamente visibles
+    const minLimit = 15;
+    const maxLimit = 85;
+    
     setClasses(prevClasses => 
       prevClasses.map(cls => 
         cls.id === isDragging 
-          ? { ...cls, x: Math.min(Math.max(10, x), 90), y: Math.min(Math.max(10, y), 90) }
+          ? { ...cls, 
+              x: Math.min(Math.max(minLimit, x), maxLimit), 
+              y: Math.min(Math.max(minLimit, y), maxLimit) 
+            }
           : cls
       )
     );
   }, [isDragging]);
+
+  // Reset class positions in a circle
+  const resetClassPositions = () => {
+    if (classes.length === 0) return;
+    
+    // Definimos límites seguros para el círculo
+    const safeRadius = 130; // Reducido para mantener las clases dentro de los límites
+    const centerX = 50;
+    const centerY = 50;
+    
+    setClasses(prevClasses => prevClasses.map((cls, index) => {
+      // Distribuir uniformemente en un círculo
+      const angle = (index / prevClasses.length) * 2 * Math.PI;
+      
+      // Si hay pocas clases, reducimos el radio para evitar que queden en las esquinas
+      const adjustedRadius = prevClasses.length <= 4 ? safeRadius * 0.7 : safeRadius;
+      
+      return {
+        ...cls,
+        x: centerX + adjustedRadius * Math.cos(angle),
+        y: centerY + adjustedRadius * Math.sin(angle)
+      };
+    }));
+  };
 
   // Get color for relation based on type
   const getRelationColor = (type: string) => {
@@ -423,14 +457,33 @@ const CBO: React.FC = () => {
               <p className="text-center text-xs text-gray-500 mb-2">
                 Arrastra las clases para reorganizar el diagrama
               </p>
+              {classes.length > 1 && (
+                <div className="text-center mb-2">
+                  <button 
+                    className="bg-gray-200 hover:bg-gray-300 text-gray-700 px-3 py-1 rounded-md text-xs"
+                    onClick={resetClassPositions}
+                  >
+                    Reorganizar en círculo
+                  </button>
+                </div>
+              )}
               <div 
                 ref={diagramRef}
                 className="relative w-full h-96 bg-white rounded-md border border-gray-200 mt-2 overflow-hidden"
                 onMouseMove={handleMouseMove}
                 onMouseUp={handleMouseUp}
                 onMouseLeave={handleMouseUp}
-                style={{ position: 'relative' }}
               >
+                {/* Círculo guía para el diagrama */}
+                <div className="absolute w-[85%] h-[85%] rounded-full border border-gray-100 bg-gray-50/30"
+                     style={{ 
+                       left: '50%', 
+                       top: '50%', 
+                       transform: 'translate(-50%, -50%)',
+                       zIndex: 5
+                     }}>
+                </div>
+                
                 {/* Class nodes - Renderizamos primero para asegurar que aparezcan */}
                 {classes.map((cls) => {
                   const colors = getClassColor(cls.couplingScore);
@@ -449,16 +502,20 @@ const CBO: React.FC = () => {
                         border: isSelected ? `2px solid ${colors.border}` : `1px solid ${colors.border}`,
                         zIndex: 15,
                         opacity: isDragging === cls.id ? 0.8 : 1,
-                        boxShadow: isSelected ? `0 0 6px ${colors.border}` : 'none',
-                        minWidth: '70px',
-                        maxWidth: '100px',
+                        boxShadow: isSelected ? `0 0 6px ${colors.border}` : '0 1px 3px rgba(0,0,0,0.12)',
+                        minWidth: '80px',
+                        maxWidth: '120px',
                         textAlign: 'center',
-                        position: 'absolute'
+                        padding: '8px',
+                        height: 'auto',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        justifyContent: 'center'
                       }}
                       onClick={(e) => { e.stopPropagation(); setSelectedClass(cls.id); }}
                       onMouseDown={(e) => handleMouseDown(cls.id, e)}
                     >
-                      <div className="font-medium text-sm">{cls.name}</div>
+                      <div className="font-medium text-sm truncate">{cls.name}</div>
                       <div className="text-xs mt-1">CBO: {cls.couplingScore}</div>
                     </div>
                   );
@@ -468,7 +525,7 @@ const CBO: React.FC = () => {
                 <svg 
                   className="absolute w-full h-full top-0 left-0"
                   viewBox="0 0 100 100"
-                  style={{ zIndex: 10, position: 'absolute' }}
+                  style={{ zIndex: 10 }}
                 >
                   {relations.map((relation) => {
                     const source = classes.find(c => c.id === relation.sourceId);
